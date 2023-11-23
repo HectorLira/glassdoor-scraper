@@ -47,43 +47,47 @@ def formatted_df(parsed_html_code: Any) -> Output[pd.DataFrame]:
     is_fast_candidacies = []
     listing_ages = []
 
-    job_cards = parsed_html_code.find_all("div", attrs={"class": "jobCard"})
+    job_cards = parsed_html_code.find_all("li", attrs={"class": "JobsList_jobListItem__JBBUV"})
 
     for job in job_cards:
+
+        company_info = job.find("div", attrs={"class": "EmployerProfile_employerInfo__GaPbq"})
     
-        company_info = job.find("div", attrs={"class": "EmployerProfile_employerInfo__EehaI"})
-        company_rating_info = company_info.find("span", attrs={"class": "EmployerProfile_employerRating__lq_ZL"})
+        try:
+            company_rating_info = company_info.find("span", attrs={"class": "EmployerProfile_employerRating__3ADTJ"})
+        except:
+            continue
         
         company_name = company_info.find_next(text=True)
         try:
-            company_rating = company_rating_info.text.replace("★", "").strip()
+            company_rating = company_rating_info.text.strip()
         except:
             company_rating = None
         
-        job_title_info = job.find("a", attrs={"class": "JobCard_seoLink__r4HUE"})
+        job_title_info = job.find("a", attrs={"class": "JobCard_seoLink__WdqHZ"})
         job_title = job_title_info.text
         job_link = job_title_info.get("href")
         job_id = job_title_info.get("id").replace("job-title-", "")
         
-        location = job.find("div", attrs={"class": "JobCard_location__DX0MJ"}).text
+        location = job.find("div", attrs={"class": "JobCard_location__N_iYE"}).text
         
-        salary_range_info = job.find("div", attrs={"class": "JobCard_salaryEstimate__TLvO7"})
+        salary_range_info = job.find("div", attrs={"class": "JobCard_salaryEstimate___m9kY"})
         try:
             salary_range = salary_range_info.text.replace("(Est. del empleador)", "").replace("\xa0", "")
         except:
             salary_range = None
             
         try:
-            is_fast_candidacy = job.find("div", attrs={"class": "JobCard_easyApply__DU2gA"}).text
+            is_fast_candidacy = job.find("div", attrs={"class": "JobCard_easyApply___eIoB"}).text
         except:
             is_fast_candidacy = None
         
-        listing_age = job.find("div", attrs={"class": "JobCard_listingAge__JPA03"}).text.replace("\xa0d", "")
+        listing_age = job.find("div", attrs={"class": "JobCard_listingAge__KuaxZ"}).text.replace("\xa0d", "")
         
         company_names.append(str(company_name))
         company_ratings.append(str(company_rating))
         job_titles.append(str(job_title))
-        job_links.append(str("https://www.glassdoor.com.mx" + job_link))
+        job_links.append(str(job_link))
         job_ids.append(str(job_id))
         locations.append(str(location))
         salary_ranges.append(str(salary_range))
